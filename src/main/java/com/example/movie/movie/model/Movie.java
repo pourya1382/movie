@@ -1,12 +1,12 @@
 package com.example.movie.movie.model;
 
-import com.opencsv.bean.CsvBindByName;
+import com.example.movie.director.model.Director;
 
 import javax.persistence.*;
-import java.util.List;
 
-@Entity(name = "movie")
+@Entity(name = "movies")
 @Table
+
 public class Movie {
     @Id
     @SequenceGenerator(
@@ -18,51 +18,54 @@ public class Movie {
             strategy = GenerationType.SEQUENCE,
             generator = "movie_sequence"
     )
+    @Column(name = "id")
+    private Long id;
 
-    @Column(name = "movie_id")
-    private Long movieId;
-    @CsvBindByName
+
     private String name;
-    @CsvBindByName
     private String linkImdb;
-    @CsvBindByName
     private Integer createYear;
-    @CsvBindByName
     private Double imdbScore;
 
-    @OneToMany(mappedBy = "movie")
-    private List<Director> directors;
+//    @ManyToMany
+//    @JoinTable(name = "category",joinColumns =@JoinColumn(name="movie_id"),inverseJoinColumns=@JoinColumn(name="director_id"))
+//    private Set<Director> directors;//    public Set<Director> getDirectors() {
+////        return directors;
+////    }
+////
+////    public void setDirectors(Set<Director> directors) {
+////        this.directors = directors;
+////    }
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "director_id", referencedColumnName = "id")
+    private Director director;
+
+    public void setDirector(Director director) {
+        this.director = director;
+    }
 
     public Movie() {
     }
 
-    public Movie(Long movieId,
-                 String name,
-                 String linkImdb,
-                 Integer createYear,
-                 Double imdbScore) {
-        this.movieId = movieId;
+    public Movie(String name, String linkImdb, Integer createYear, Double imdbScore) {
         this.name = name;
         this.linkImdb = linkImdb;
         this.createYear = createYear;
         this.imdbScore = imdbScore;
-
     }
+
     public Movie(String name,
                  String linkImdb,
                  Integer createYear,
-                 Double imdbScore) {
+                 Double imdbScore, Director director) {
         this.name = name;
         this.linkImdb = linkImdb;
         this.createYear = createYear;
         this.imdbScore = imdbScore;
+        this.director = director;
     }
 
-
-
-    public Long getmovieId() {
-        return movieId;
-    }
 
     public String getName() {
         return name;
@@ -80,9 +83,6 @@ public class Movie {
         return imdbScore;
     }
 
-    public void setmovieId(Long movieId) {
-        this.movieId = movieId;
-    }
 
     public void setName(String name) {
         this.name = name;
@@ -103,11 +103,12 @@ public class Movie {
     @Override
     public String toString() {
         return "Movie{" +
-                "id=" + movieId +
+                "id=" + id +
                 ", name='" + name + '\'' +
                 ", linkImdb='" + linkImdb + '\'' +
                 ", createYear=" + createYear +
                 ", imdbScore=" + imdbScore +
+                ", director=" + director +
                 '}';
     }
 }

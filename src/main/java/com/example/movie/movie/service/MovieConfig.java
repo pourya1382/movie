@@ -1,8 +1,6 @@
 package com.example.movie.movie.service;
 
-import com.example.movie.movie.model.Director;
 import com.example.movie.movie.model.Movie;
-import com.example.movie.movie.repository.DirectorRepository;
 import com.example.movie.movie.repository.MovieRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;

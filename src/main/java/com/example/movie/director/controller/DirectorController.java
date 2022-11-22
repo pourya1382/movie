@@ -1,8 +1,8 @@
-package com.example.movie.movie.controller;
+package com.example.movie.director.controller;
 
-import com.example.movie.movie.model.Director;
-import com.example.movie.movie.model.DirectorDto;
-import com.example.movie.movie.service.DirectorService;
+import com.example.movie.director.model.DirectorDto;
+import com.example.movie.director.model.Director;
+import com.example.movie.director.service.DirectorService;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 

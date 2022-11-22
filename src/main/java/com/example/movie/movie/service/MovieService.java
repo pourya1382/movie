@@ -1,8 +1,9 @@
 package com.example.movie.movie.service;
 
+import com.example.movie.director.model.Director;
 import com.example.movie.movie.model.Movie;
 import com.example.movie.movie.model.MovieDto;
-import com.example.movie.movie.repository.DirectorRepository;
+import com.example.movie.director.repository.DirectorRepository;
 import com.example.movie.movie.repository.MovieRepository;
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
@@ -19,7 +20,6 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 public class MovieService {
@@ -83,10 +83,10 @@ public class MovieService {
     }
 @Transactional
     public Movie updateMovie(Long movieId, MovieDto movieDto) {
-    Movie movie = movieRepository.findById(movieId)
-            .orElseThrow(() -> new IllegalStateException(
-                    "movie with id " + movieId + " does not exist!"
-            ));
+    Movie movie = movieRepository.findById(movieId).get();
+//            .orElseThrow(() -> new IllegalStateException(
+//                    "movie with id " + movieId + " does not exist!"
+//            ));
     Movie movieRequest = modelMapper.map(movieDto, Movie.class);
     movie.setName(movieRequest.getName());
     movie.setCreateYear(movieRequest.getCreateYear());
@@ -94,6 +94,13 @@ public class MovieService {
     movie.setLinkImdb(movieRequest.getLinkImdb());
     movieRepository.save(movie);
     return movie;
+    }
+
+    public Movie movieDirectors(Long movieId, Long directorId) {
+        Movie movie = movieRepository.findById(movieId).get();
+        Director director = directorRepository.findByDirectorId(directorId);
+        movie.setDirector(director);
+        return movieRepository.save(movie);
     }
 }
 

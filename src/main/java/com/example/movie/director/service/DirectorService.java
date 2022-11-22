@@ -1,8 +1,9 @@
-package com.example.movie.movie.service;
-import com.example.movie.movie.model.Director;
-import com.example.movie.movie.model.DirectorDto;
-import com.example.movie.movie.model.Movie;
-import com.example.movie.movie.repository.DirectorRepository;
+package com.example.movie.director.service;
+
+import com.example.movie.director.model.Director;
+import com.example.movie.director.model.DirectorDto;
+import com.example.movie.director.repository.DirectorRepository;
+import com.example.movie.movie.repository.MovieRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -10,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.List;
 
 
 @Service
@@ -17,10 +19,12 @@ import javax.transaction.Transactional;
 public class DirectorService {
     private DirectorRepository directorRepository;
     private ModelMapper modelMapper;
+    private MovieRepository movieRepository;
 
-    public DirectorService(DirectorRepository directorRepository,ModelMapper modelMapper) {
+    public DirectorService(DirectorRepository directorRepository, ModelMapper modelMapper, MovieRepository movieRepository) {
         this.directorRepository = directorRepository;
-        this.modelMapper=modelMapper;
+        this.modelMapper = modelMapper;
+        this.movieRepository = movieRepository;
     }
 
     public Page<Director> getDirector(int page, int size) {
@@ -31,9 +35,13 @@ public class DirectorService {
     }
 
     public Director addNewDirector(Director director) {
-        Director director1 = directorRepository.save(director);
-        return director1;
+        Director addirector = directorRepository.save(director);
+//        addirector.setMovies(movieRepository.findByMovieId(director.getMovieId()));
+        directorRepository.save(addirector);
+
+        return addirector;
     }
+
     @Transactional
 
     public Director updateMovie(Long directorId, DirectorDto directorDto) {
@@ -41,10 +49,12 @@ public class DirectorService {
                 .orElseThrow(() -> new IllegalStateException(
                         "director with id " + directorId + " does not exist!"
                 ));
-        Director directorRequest = modelMapper.map(directorDto, Director.class);
-        director.setAge(directorRequest.getAge());
-        director.setFamily(directorRequest.getFamily());
-        director.setName(directorRequest.getName());
+//        Director directorRequest = modelMapper.map(directorDto, Director.class);
+        director.setAge(directorDto.getAge());
+        director.setFamily(directorDto.getFamily());
+        director.setName(directorDto.getName());
+//        director.setMovieId(directorDto.getMovieId());
+//        director.setMovies(movieRepository.findByMovieId(directorDto.getMovieId()));
         directorRepository.save(director);
         return director;
     }

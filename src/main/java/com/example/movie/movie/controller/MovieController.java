@@ -2,13 +2,13 @@ package com.example.movie.movie.controller;
 
 import com.example.movie.movie.model.Movie;
 import com.example.movie.movie.model.MovieDto;
-import com.example.movie.movie.service.DirectorService;
+import com.example.movie.director.service.DirectorService;
 import com.example.movie.movie.service.MovieService;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(path = "movie")
+@RequestMapping( "/movies")
 public class MovieController {
     private final MovieService movieService;
     private final DirectorService directorService;
@@ -29,6 +29,13 @@ public class MovieController {
     public Movie addNewMovie(@RequestBody Movie movie) {
         return movieService.addNewMovie(movie);
     }
+    @PutMapping(path = "{movieId}/directors_personal/{directorId}")
+    public Movie movieDirectors(@PathVariable Long movieId,
+                                @PathVariable Long directorId
+    ){
+        return movieService.movieDirectors(movieId,directorId);
+    }
+
     @PutMapping(path = "{movieId}")
     public Movie updateMovie(@PathVariable("movieId") Long movieId, @RequestBody MovieDto movieDto) {
         return movieService.updateMovie(movieId, movieDto);
