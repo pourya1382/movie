@@ -34,11 +34,11 @@ public class Movie {
     private boolean watchMovie;
     private boolean viewOnAnotherOccasion;
 
-    public void setDirector_id(Long director_id) {
-        this.director_id = director_id;
-    }
-
-    private Long director_id;
+//    public void setDirector_id(Long director_id) {
+//        this.director_id = director_id;
+//    }
+//
+//    private Long director_id;
 
 //    @ManyToMany
 //    @JoinTable(name = "category",joinColumns =@JoinColumn(name="movie_id"),inverseJoinColumns=@JoinColumn(name="director_id"))

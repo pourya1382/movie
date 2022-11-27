@@ -56,7 +56,7 @@ public class MovieService {
         this.directorRepository = directorRepository;
     }
 
-    public Page<Movie> getMovie(String movieName, int createYear, String viewStatus, int page, int size) {
+    public Page<Movie> getMovieBysearch(String movieName, int createYear, String viewStatus, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Movie> moviePage;
         if (viewStatus.equals("seen")) {
@@ -152,6 +152,13 @@ public class MovieService {
             moviePage = movieRepository.findAll(pageable);
         }
         return moviePage;
+    }
+
+    public Page<Movie> getMovie(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Movie> movies;
+        movies=movieRepository.findAll(pageable);
+        return movies;
     }
 }
 

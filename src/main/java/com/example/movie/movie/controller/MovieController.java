@@ -15,21 +15,27 @@ public class MovieController {
     private final DirectorService directorService;
 
 
-
     public MovieController(MovieService movieService, DirectorService directorService) {
         this.movieService = movieService;
         this.directorService = directorService;
     }
 
-
     @GetMapping()
+    public Page<Movie> getMovie(@RequestParam(defaultValue = "0") int page,
+                                @RequestParam(defaultValue = "3") int size
+    ){
+        return movieService.getMovie(page,size);
+    }
+
+
+    @GetMapping(path = "search")
     public Page<Movie> getMovie(@RequestParam(required = false) String movieName,
-                                @RequestParam(required = false,defaultValue = "0") int createYear,
+                                @RequestParam(required = false, defaultValue = "0") int createYear,
                                 @RequestParam(required = false) String viewStatus,
                                 @RequestParam(defaultValue = "0") int page,
                                 @RequestParam(defaultValue = "3") int size
     ) {
-        return movieService.getMovie(movieName, createYear, viewStatus, page, size);
+        return movieService.getMovieBysearch(movieName, createYear, viewStatus, page, size);
     }
 
     @GetMapping("sort")
@@ -37,7 +43,7 @@ public class MovieController {
                                         @RequestParam(defaultValue = "3") int size,
                                         @RequestParam(defaultValue = "asc") String ascOrDesc
     ) {
-        return movieService.sortingMovie(page,size,ascOrDesc);
+        return movieService.sortingMovie(page, size, ascOrDesc);
 
     }
 
