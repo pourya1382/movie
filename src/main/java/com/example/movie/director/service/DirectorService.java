@@ -11,7 +11,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.List;
 
 
 @Service
@@ -52,7 +51,7 @@ public class DirectorService {
 //        Director directorRequest = modelMapper.map(directorDto, Director.class);
         director.setAge(directorDto.getAge());
         director.setFamily(directorDto.getFamily());
-        director.setName(directorDto.getName());
+        director.setDirectorName(directorDto.getDirectorName());
 //        director.setMovieId(directorDto.getMovieId());
 //        director.setMovies(movieRepository.findByMovieId(directorDto.getMovieId()));
         directorRepository.save(director);

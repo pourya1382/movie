@@ -1,11 +1,15 @@
 package com.example.movie.movie.model;
 
 import com.example.movie.director.model.Director;
+import lombok.Getter;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity(name = "movies")
 @Table
+@Getter
 
 public class Movie {
     @Id
@@ -27,6 +31,15 @@ public class Movie {
     private Integer createYear;
     private Double imdbScore;
 
+    private boolean watchMovie;
+    private boolean viewOnAnotherOccasion;
+
+    public void setDirector_id(Long director_id) {
+        this.director_id = director_id;
+    }
+
+    private Long director_id;
+
 //    @ManyToMany
 //    @JoinTable(name = "category",joinColumns =@JoinColumn(name="movie_id"),inverseJoinColumns=@JoinColumn(name="director_id"))
 //    private Set<Director> directors;//    public Set<Director> getDirectors() {
@@ -37,12 +50,16 @@ public class Movie {
 ////        this.directors = directors;
 ////    }
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "director_id", referencedColumnName = "id")
-    private Director director;
+    @ManyToMany()
+    @JoinTable(
+            name = "moviedirectors",
+            joinColumns = @JoinColumn(name = "movie_id"),
+            inverseJoinColumns = @JoinColumn(name = "director_id")
+    )
+    private Set<Director> directors = new HashSet<>();
 
-    public void setDirector(Director director) {
-        this.director = director;
+    public void setDirectors(Director director) {
+        directors.add(director);
     }
 
     public Movie() {
@@ -58,12 +75,12 @@ public class Movie {
     public Movie(String name,
                  String linkImdb,
                  Integer createYear,
-                 Double imdbScore, Director director) {
+                 Double imdbScore, Set<Director> directors) {
         this.name = name;
         this.linkImdb = linkImdb;
         this.createYear = createYear;
         this.imdbScore = imdbScore;
-        this.director = director;
+        this.directors = directors;
     }
 
 
@@ -108,7 +125,7 @@ public class Movie {
                 ", linkImdb='" + linkImdb + '\'' +
                 ", createYear=" + createYear +
                 ", imdbScore=" + imdbScore +
-                ", director=" + director +
+                ", director=" + directors +
                 '}';
     }
 }

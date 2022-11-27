@@ -1,7 +1,7 @@
 package com.example.movie.director.controller;
 
-import com.example.movie.director.model.DirectorDto;
 import com.example.movie.director.model.Director;
+import com.example.movie.director.model.DirectorDto;
 import com.example.movie.director.service.DirectorService;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
@@ -33,8 +33,9 @@ public class DirectorController {
     ) {
         return directorService.updateMovie(directorId, directorDto);
     }
+
     @DeleteMapping(path = "{directorId}")
-    public void deleteDirector(@PathVariable("directorId")Long directorId){
+    public void deleteDirector(@PathVariable("directorId") Long directorId) {
         directorService.deleteDirector(directorId);
     }
 }

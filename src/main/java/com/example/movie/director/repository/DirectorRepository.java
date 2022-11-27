@@ -11,7 +11,7 @@ import java.util.Optional;
 
 public interface DirectorRepository extends JpaRepository<Director, Long> {
     @Query("SELECT d FROM directors d where d.id=?1")
-    Director findByDirectorId(Long id);
+    Optional<Director> findByDirectorId(Long id);
 
 //@Query("SELECT d FROM movie d JOIN director .movie =movie.movieId")
 //    movieDto allInformation;

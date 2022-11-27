@@ -6,7 +6,7 @@ import lombok.Data;
 public class DirectorDto {
     private Long directorId;
     private Long movieId;
-    private String name;
+    private String directorName;
     private String family;
     private Integer age;
 }

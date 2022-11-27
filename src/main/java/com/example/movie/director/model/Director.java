@@ -1,9 +1,11 @@
 package com.example.movie.director.model;
 
 import com.example.movie.movie.model.Movie;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity(name = "directors")
 @Table
@@ -20,45 +22,57 @@ public class Director {
     )
     @Column(name = "id")
     private Long id;
-    private String nameDirector;
+    private String directorName;
     private String family;
     private Integer age;
-//    @ManyToMany(mappedBy = "directors")
+    //    @ManyToMany(mappedBy = "directors")
 //    private Set<Movie> movie;
-    @OneToMany(mappedBy = "director")
-    private List<Movie> movies;
+    @JsonIgnore
+    @ManyToMany(mappedBy = "directors",fetch = FetchType.LAZY)
+    private Set<Movie> movies =new HashSet<>();
 
 
-    public Director(Long id, String nameDirector, String family, Integer age) {
+    public Director(Long id, String directorName, String family, Integer age) {
         this.id = id;
-        this.nameDirector = nameDirector;
+        this.directorName = directorName;
         this.family = family;
         this.age = age;
 
     }
 
-    public Director(String nameDirector, String family, Integer age) {
-        this.nameDirector = nameDirector;
+    public Director(String directorName, String family, Integer age) {
+        this.directorName = directorName;
         this.family = family;
         this.age = age;
 
     }
 
 
-    public List<Movie> getMovies() {
+    public Set<Movie> getMovies() {
         return movies;
     }
 
     public Director() {
     }
 
-
-    public String getName() {
-        return nameDirector;
+    public Director(Long id, String directorName, String family, Integer age, Set<Movie> movies) {
+        this.id = id;
+        this.directorName = directorName;
+        this.family = family;
+        this.age = age;
+        this.movies = movies;
     }
 
-    public void setName(String nameDirector) {
-        this.nameDirector = nameDirector;
+    public void setMovies(Movie movie) {
+        movies.add(movie);
+    }
+
+    public String getDirectorName() {
+        return directorName;
+    }
+
+    public void setDirectorName(String nameDirector) {
+        this.directorName = nameDirector;
     }
 
     public String getFamily() {
@@ -89,7 +103,7 @@ public class Director {
     public String toString() {
         return "Director{" +
                 "id=" + id +
-                ", nameDirector='" + nameDirector + '\'' +
+                ", nameDirector='" + directorName + '\'' +
                 ", family='" + family + '\'' +
                 ", age=" + age +
                 '}';

@@ -1,9 +1,9 @@
 package com.example.movie.movie.service;
 
 import com.example.movie.director.model.Director;
+import com.example.movie.director.repository.DirectorRepository;
 import com.example.movie.movie.model.Movie;
 import com.example.movie.movie.model.MovieDto;
-import com.example.movie.director.repository.DirectorRepository;
 import com.example.movie.movie.repository.MovieRepository;
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
@@ -16,9 +16,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.*;
 import java.util.List;
 
 @Service
@@ -26,6 +24,31 @@ public class MovieService {
     private MovieRepository movieRepository;
     private ModelMapper modelMapper;
     private DirectorRepository directorRepository;
+    private String line;
+
+
+//    public void readCsv() {
+//        try {
+//            BufferedReader bufferedReader = new BufferedReader(new FileReader("src/main/resources/movie.csv"));
+//            while ((line = bufferedReader.readLine()) != null) {
+//                String[] data = line.split(",");
+//                int dataint = Integer.parseInt(data[2]);
+//
+//
+//
+//            Movie movie = new Movie();
+//            movie.setName(data[0]);
+//            movie.setLinkImdb(data[1]);
+//            movie.setCreateYear(data[2]);
+//            movie.setImdbScore(data[3]);
+//            movieRepository.save(movie);
+//            }
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+//
+//
+//    }
 
     public MovieService(MovieRepository movieRepository, ModelMapper modelMapper, DirectorRepository directorRepository) {
         this.movieRepository = movieRepository;
@@ -33,10 +56,18 @@ public class MovieService {
         this.directorRepository = directorRepository;
     }
 
-    public Page<Movie> getMovie(int page, int size) {
+    public Page<Movie> getMovie(String movieName, int createYear, String viewStatus, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Movie> moviePage;
-        moviePage = movieRepository.findAll(pageable);
+        if (viewStatus.equals("seen")) {
+            moviePage = movieRepository.findByWatchMovieAndNameContainingAndCreateYear(Boolean.TRUE, movieName, createYear, pageable);
+        } else if (viewStatus.equals("unseen")) {
+            moviePage = movieRepository.findByWatchMovieAndNameContainingAndCreateYear(Boolean.FALSE, movieName, createYear, pageable);
+        } else if (createYear == 0) {
+            moviePage = movieRepository.findByNameContaining(movieName, pageable);
+        } else {
+            moviePage = movieRepository.findByNameContainingAndCreateYear(movieName, createYear, pageable);
+        }
         return moviePage;
     }
 
@@ -81,26 +112,46 @@ public class MovieService {
     public void deleteMovie(Long movieId) {
         movieRepository.deleteById(movieId);
     }
-@Transactional
+
+    @Transactional
     public Movie updateMovie(Long movieId, MovieDto movieDto) {
-    Movie movie = movieRepository.findById(movieId).get();
+        Movie movie = movieRepository.findById(movieId).get();
 //            .orElseThrow(() -> new IllegalStateException(
 //                    "movie with id " + movieId + " does not exist!"
 //            ));
-    Movie movieRequest = modelMapper.map(movieDto, Movie.class);
-    movie.setName(movieRequest.getName());
-    movie.setCreateYear(movieRequest.getCreateYear());
-    movie.setImdbScore(movieRequest.getImdbScore());
-    movie.setLinkImdb(movieRequest.getLinkImdb());
-    movieRepository.save(movie);
-    return movie;
+        Movie movieRequest = modelMapper.map(movieDto, Movie.class);
+        movie.setName(movieRequest.getName());
+        movie.setCreateYear(movieRequest.getCreateYear());
+        movie.setImdbScore(movieRequest.getImdbScore());
+        movie.setLinkImdb(movieRequest.getLinkImdb());
+        movieRepository.save(movie);
+        return movie;
     }
 
     public Movie movieDirectors(Long movieId, Long directorId) {
         Movie movie = movieRepository.findById(movieId).get();
-        Director director = directorRepository.findByDirectorId(directorId);
-        movie.setDirector(director);
+        Director director = directorRepository.findByDirectorId(directorId).get();
+        movie.setDirectors(director);
         return movieRepository.save(movie);
+    }
+
+    public Page<Movie> viewOnAnotherOccasion(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Movie> moviePage;
+        return movieRepository.findByViewOnAnotherOccasion(Boolean.TRUE, pageable);
+    }
+
+    public Page<Movie> sortingMovie(int page, int size, String ascOrDesc) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Movie> moviePage;
+        if (ascOrDesc.equals("asc")) {
+            moviePage = movieRepository.findByOrderByName(pageable);
+        } else if (ascOrDesc.equals("invers")) {
+            moviePage = movieRepository.findByOrderByNameDesc(pageable);
+        } else {
+            moviePage = movieRepository.findAll(pageable);
+        }
+        return moviePage;
     }
 }
 
