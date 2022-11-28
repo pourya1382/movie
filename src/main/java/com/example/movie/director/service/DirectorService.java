@@ -18,12 +18,10 @@ import javax.transaction.Transactional;
 public class DirectorService {
     private DirectorRepository directorRepository;
     private ModelMapper modelMapper;
-    private MovieRepository movieRepository;
 
-    public DirectorService(DirectorRepository directorRepository, ModelMapper modelMapper, MovieRepository movieRepository) {
+    public DirectorService(DirectorRepository directorRepository, ModelMapper modelMapper) {
         this.directorRepository = directorRepository;
         this.modelMapper = modelMapper;
-        this.movieRepository = movieRepository;
     }
 
     public Page<Director> getDirector(int page, int size) {

@@ -30,7 +30,6 @@ public class Movie {
     private String linkImdb;
     private Integer createYear;
     private Double imdbScore;
-
     private boolean watchMovie;
     private boolean watchLater;
 
@@ -62,6 +61,15 @@ public class Movie {
         directors.add(director);
     }
 
+    public Movie(String name, String linkImdb, Integer createYear, Double imdbScore, boolean watchMovie, boolean watchLater) {
+        this.name = name;
+        this.linkImdb = linkImdb;
+        this.createYear = createYear;
+        this.imdbScore = imdbScore;
+        this.watchMovie = watchMovie;
+        this.watchLater = watchLater;
+    }
+
     public Movie() {
     }
 
@@ -81,6 +89,22 @@ public class Movie {
         this.createYear = createYear;
         this.imdbScore = imdbScore;
         this.directors = directors;
+    }
+
+    public boolean isWatchLater() {
+        return watchLater;
+    }
+
+    public void setWatchLater(boolean watchLater) {
+        this.watchLater = watchLater;
+    }
+
+    public boolean isWatchMovie() {
+        return watchMovie;
+    }
+
+    public void setWatchMovie(boolean watchMovie) {
+        this.watchMovie = watchMovie;
     }
 
 

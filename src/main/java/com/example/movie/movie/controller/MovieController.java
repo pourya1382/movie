@@ -33,10 +33,12 @@ public class MovieController {
                                 @RequestParam(required = false,defaultValue = "0") int create_year,
                                 @RequestParam(required = false) String view_status,
                                 @RequestParam(required = false) String watch_later,
+                                @RequestParam(required = false) String movie_sorting,
+                                @RequestParam(required = false) String create_sorting,
                                 @RequestParam(defaultValue = "0") int page,
                                 @RequestParam(defaultValue = "3") int size
     ) {
-        return movieService.getMovieBysearch(movie_name, create_year, view_status, watch_later,page, size);
+        return movieService.getMovieBysearch(movie_name, create_year, view_status, watch_later,movie_sorting,create_sorting,page, size);
     }
 
     @GetMapping("sort")

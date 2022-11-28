@@ -11,6 +11,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,8 +27,6 @@ public class MovieService {
     private MovieRepository movieRepository;
     private ModelMapper modelMapper;
     private DirectorRepository directorRepository;
-    private String line;
-
 
 //    public void readCsv() {
 //        try {
@@ -58,30 +57,93 @@ public class MovieService {
         this.directorRepository = directorRepository;
     }
 
-    public Page<Movie> getMovieBysearch(String movieName, int createYear, String view_Status, String watch_Later, int page, int size) {
+    public Page<Movie> getMovieBysearch(String movieName, int createYear, String view_Status, String watch_Later, String movie_sorting, String create_sorting, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
+
+        if (movie_sorting.equals("sort_by_name")) {
+            pageable = PageRequest.of(page, size, Sort.by("name"));
+        } else if (movie_sorting.equals("sort_by_name_descending")) {
+            pageable = PageRequest.of(page, size, Sort.by("name").descending());
+        } else if (create_sorting.equals("sort_by_create")) {
+            pageable = PageRequest.of(page, size, Sort.by("createYear"));
+        } else if (create_sorting.equals("sort_by_create_descending")) {
+            pageable = PageRequest.of(page, size, Sort.by("createYear").descending());
+        }
         Page<Movie> moviePage;
         moviePage = movieRepository.findAll(pageable);
-        boolean watchLaterBoolean;
-        boolean viewStatusBoolean;
+        boolean watchLaterBoolean = Boolean.FALSE;
+        boolean viewStatusBoolean = Boolean.FALSE;
         if (!movieName.isEmpty()) {
             movieName.toLowerCase();
         }
         if (watch_Later.equals("yes")) {
             watchLaterBoolean = Boolean.TRUE;
-        } else {
+        } else if (watch_Later.equals("no")) {
             watchLaterBoolean = Boolean.FALSE;
         }
         if (view_Status.equals("seen")) {
             viewStatusBoolean = Boolean.TRUE;
-        } else {
+        } else if (view_Status.equals("unseen")) {
             viewStatusBoolean = Boolean.FALSE;
         }
+
         if (createYear == 0) {
-            moviePage = movieRepository.findByNameContainingIgnoreCaseAndWatchMovieAndWatchLater(movieName, viewStatusBoolean, watchLaterBoolean, pageable);
+            if (view_Status.isEmpty() && watch_Later.isEmpty()) {
+                moviePage = movieRepository.findByNameContainingIgnoreCase(movieName, pageable);
+            } else if (view_Status.isEmpty() && !watch_Later.isEmpty()) {
+                moviePage = movieRepository.findByNameContainingIgnoreCaseAndWatchLater(movieName, watchLaterBoolean, pageable);
+            } else if (!view_Status.isEmpty() && watch_Later.isEmpty()) {
+                moviePage = movieRepository.findByNameContainingIgnoreCaseAndWatchMovie(movieName, viewStatusBoolean, pageable);
+            } else {
+                moviePage = movieRepository.findByNameContainingIgnoreCaseAndWatchMovieAndWatchLater(movieName, viewStatusBoolean, watchLaterBoolean, pageable);
+            }
         } else {
-            moviePage = movieRepository.findByNameContainingIgnoreCaseAndCreateYearAndWatchMovieAndWatchLater(movieName, createYear, viewStatusBoolean, watchLaterBoolean, pageable);
+            if (view_Status.isEmpty() && watch_Later.isEmpty()) {
+                moviePage = movieRepository.findByNameContainingIgnoreCaseAndCreateYear(movieName,createYear, pageable);
+            } else if (view_Status.isEmpty() && !watch_Later.isEmpty()) {
+                moviePage = movieRepository.findByNameContainingIgnoreCaseAndCreateYearAndWatchLater(movieName,createYear, watchLaterBoolean, pageable);
+            } else if (!view_Status.isEmpty() && watch_Later.isEmpty()) {
+                moviePage = movieRepository.findByNameContainingIgnoreCaseAndCreateYearAndWatchMovie(movieName,createYear, viewStatusBoolean, pageable);
+            } else {
+                moviePage = movieRepository.findByNameContainingIgnoreCaseAndCreateYearAndWatchMovieAndWatchLater(movieName, createYear, viewStatusBoolean, watchLaterBoolean, pageable);
+            }
         }
+//        if (movie_sorting.equals("sort_by_name")){
+//            moviePage = movieRepository.findByNameContainingIgnoreCaseAndWatchMovieAndWatchLater(movieName, viewStatusBoolean, watchLaterBoolean, pageable,Sort.by("name"));
+//        }
+
+//        if (createYear == 0) {
+//
+//            if (movieName.isEmpty()) {
+//                switch (create_sorting) {
+//                    case "by_name_sort":
+//                        moviePage = movieRepository.findByOrderByNameAndWatchMovieAndWatchLater(viewStatusBoolean, watchLaterBoolean, pageable);
+//                        break;
+//                    case "by_name_sort_invers":
+//                        moviePage = movieRepository.findByOrderByNameAscAndWatchMovieAndWatchLater(viewStatusBoolean, watchLaterBoolean, pageable);
+//                        break;
+//                }
+//            } else {
+//                switch (create_sorting) {
+//                    case "by_create_year_sort":
+//                        moviePage = movieRepository.findByNameOrderByCreateYearAndContainingIgnoreCaseAndWatchMovieAndWatchLater(movieName, viewStatusBoolean, watchLaterBoolean, pageable);
+//                        break;
+//                    case "by_create_year_sort_invers":
+//                        moviePage = movieRepository.findByOrderByCreateYearAscAndNameContainingIgnoreCaseAndWatchMovieAndWatchLater(movieName, viewStatusBoolean, watchLaterBoolean, pageable);
+//                        break;
+//                    default:
+//                        moviePage = movieRepository.findByNameContainingIgnoreCaseAndWatchMovieAndWatchLater(movieName, viewStatusBoolean, watchLaterBoolean, pageable);
+//                }
+//            }
+//        } else {
+//            if (movie_sorting.equals("by_name_sort")) {
+//                moviePage = movieRepository.findByOrderByNameAndCreateYearAndWatchMovieAndWatchLater(createYear, viewStatusBoolean, watchLaterBoolean, pageable);
+//            } else if (movie_sorting.equals("by_name_sort_invers")) {
+//                moviePage = movieRepository.findByOrderByNameAscAndCreateYearAndWatchMovieAndWatchLater(createYear, viewStatusBoolean, watchLaterBoolean, pageable);
+//            } else  {
+//                moviePage = movieRepository.findByNameContainingIgnoreCaseAndWatchMovieAndWatchLater(movieName, viewStatusBoolean, watchLaterBoolean, pageable);
+//            }
+//        }
         return moviePage;
     }
 
