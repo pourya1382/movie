@@ -29,13 +29,14 @@ public class MovieController {
 
 
     @GetMapping(path = "search")
-    public Page<Movie> getMovie(@RequestParam(required = false) String movieName,
-                                @RequestParam(required = false, defaultValue = "0") int createYear,
-                                @RequestParam(required = false) String viewStatus,
+    public Page<Movie> getMovie(@RequestParam(required = false) String movie_name,
+                                @RequestParam(required = false,defaultValue = "0") int create_year,
+                                @RequestParam(required = false) String view_status,
+                                @RequestParam(required = false) String watch_later,
                                 @RequestParam(defaultValue = "0") int page,
                                 @RequestParam(defaultValue = "3") int size
     ) {
-        return movieService.getMovieBysearch(movieName, createYear, viewStatus, page, size);
+        return movieService.getMovieBysearch(movie_name, create_year, view_status, watch_later,page, size);
     }
 
     @GetMapping("sort")
@@ -45,13 +46,6 @@ public class MovieController {
     ) {
         return movieService.sortingMovie(page, size, ascOrDesc);
 
-    }
-
-    @GetMapping(path = "view_on_another_occasion")
-    public Page<Movie> viewOnAnotherOccasion(@RequestParam(defaultValue = "0") int page,
-                                             @RequestParam(defaultValue = "3") int size
-    ) {
-        return movieService.viewOnAnotherOccasion(page, size);
     }
 
     @PostMapping(path = "add-movie")

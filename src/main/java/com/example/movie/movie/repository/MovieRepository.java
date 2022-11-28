@@ -1,4 +1,5 @@
 package com.example.movie.movie.repository;
+
 import com.example.movie.movie.model.Movie;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,21 +11,32 @@ import java.util.Optional;
 
 @Repository
 
-public interface MovieRepository extends JpaRepository<Movie,Long> {
+public interface MovieRepository extends JpaRepository<Movie, Long> {
 
     @Query("SELECT m FROM movies m WHERE m.id=?1")
     Optional<Movie> findByMovieId(Long id);
 
+//    @Query("SELECT m FROM movies m WHERE  COALESCE(m.name,movies.name) =?1 and COALESCE( m.createYear,movies.createYear)=?1 and COALESCE( m.watchMovie,movies.watchMovie)=?1 and COALESCE( m.watchLater,movies.watchLater)=?1")
+//    Page<Movie> findMovieBySearch(String name, Integer createYear, boolean watchMovie, boolean watchLater, Pageable pageable);
+
+    Page<Movie> findByNameContainingIgnoreCaseAndCreateYearAndWatchMovieAndWatchLater(String name,
+                                                                                  Integer createYear,
+                                                                                  boolean watchMovie,
+                                                                                  boolean watchLater,
+                                                                                  Pageable pageable
+    );
+    Page<Movie> findByNameContainingIgnoreCaseAndWatchMovieAndWatchLater(String name,
+                                                                         boolean watchMovie,
+                                                                         boolean watchLater,
+                                                                         Pageable pageable
+    );
     Page<Movie> findByWatchMovieAndNameContainingAndCreateYear(Boolean watchMovie,String name,Integer createYear ,Pageable pageable);
-    Page<Movie> findByViewOnAnotherOccasion(boolean viewOnAnotherOccasion,Pageable pageable);
-    Page<Movie> findByNameContainingAndCreateYear(String movieName,Integer createYear, Pageable pageable);
-    Page<Movie> findByNameContaining(String movieName, Pageable pageable);
+//    Page<Movie> findByViewOnAnotherOccasion(boolean viewOnAnotherOccasion,Pageable pageable);
+//    Page<Movie> findByNameContainingAndCreateYear(String movieName,Integer createYear, Pageable pageable);
+    Page<Movie> findByNameContainingIgnoreCase(String movieName, Pageable pageable);
     Page<Movie> findByOrderByName(Pageable pageable);
+
     Page<Movie> findByOrderByNameDesc(Pageable pageable);
-
-
-
-
 
 
 //    @Query("SELECT d,m FROM director d INNER JOIN movie m ON d.movieId=m.movieId")

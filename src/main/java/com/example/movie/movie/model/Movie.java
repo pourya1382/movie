@@ -32,7 +32,7 @@ public class Movie {
     private Double imdbScore;
 
     private boolean watchMovie;
-    private boolean viewOnAnotherOccasion;
+    private boolean watchLater;
 
 //    public void setDirector_id(Long director_id) {
 //        this.director_id = director_id;

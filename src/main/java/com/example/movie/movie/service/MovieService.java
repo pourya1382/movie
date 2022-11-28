@@ -16,7 +16,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.List;
 
 @Service
@@ -56,17 +58,29 @@ public class MovieService {
         this.directorRepository = directorRepository;
     }
 
-    public Page<Movie> getMovieBysearch(String movieName, int createYear, String viewStatus, int page, int size) {
+    public Page<Movie> getMovieBysearch(String movieName, int createYear, String view_Status, String watch_Later, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Movie> moviePage;
-        if (viewStatus.equals("seen")) {
-            moviePage = movieRepository.findByWatchMovieAndNameContainingAndCreateYear(Boolean.TRUE, movieName, createYear, pageable);
-        } else if (viewStatus.equals("unseen")) {
-            moviePage = movieRepository.findByWatchMovieAndNameContainingAndCreateYear(Boolean.FALSE, movieName, createYear, pageable);
-        } else if (createYear == 0) {
-            moviePage = movieRepository.findByNameContaining(movieName, pageable);
+        moviePage = movieRepository.findAll(pageable);
+        boolean watchLaterBoolean;
+        boolean viewStatusBoolean;
+        if (!movieName.isEmpty()) {
+            movieName.toLowerCase();
+        }
+        if (watch_Later.equals("yes")) {
+            watchLaterBoolean = Boolean.TRUE;
         } else {
-            moviePage = movieRepository.findByNameContainingAndCreateYear(movieName, createYear, pageable);
+            watchLaterBoolean = Boolean.FALSE;
+        }
+        if (view_Status.equals("seen")) {
+            viewStatusBoolean = Boolean.TRUE;
+        } else {
+            viewStatusBoolean = Boolean.FALSE;
+        }
+        if (createYear == 0) {
+            moviePage = movieRepository.findByNameContainingIgnoreCaseAndWatchMovieAndWatchLater(movieName, viewStatusBoolean, watchLaterBoolean, pageable);
+        } else {
+            moviePage = movieRepository.findByNameContainingIgnoreCaseAndCreateYearAndWatchMovieAndWatchLater(movieName, createYear, viewStatusBoolean, watchLaterBoolean, pageable);
         }
         return moviePage;
     }
@@ -135,12 +149,6 @@ public class MovieService {
         return movieRepository.save(movie);
     }
 
-    public Page<Movie> viewOnAnotherOccasion(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<Movie> moviePage;
-        return movieRepository.findByViewOnAnotherOccasion(Boolean.TRUE, pageable);
-    }
-
     public Page<Movie> sortingMovie(int page, int size, String ascOrDesc) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Movie> moviePage;
@@ -157,7 +165,7 @@ public class MovieService {
     public Page<Movie> getMovie(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Movie> movies;
-        movies=movieRepository.findAll(pageable);
+        movies = movieRepository.findAll(pageable);
         return movies;
     }
 }
