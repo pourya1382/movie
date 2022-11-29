@@ -25,11 +25,9 @@ public class Director {
     private String directorName;
     private String family;
     private Integer age;
-    //    @ManyToMany(mappedBy = "directors")
-//    private Set<Movie> movie;
     @JsonIgnore
-    @ManyToMany(mappedBy = "directors",fetch = FetchType.LAZY)
-    private Set<Movie> movies =new HashSet<>();
+    @ManyToMany(mappedBy = "directors", fetch = FetchType.LAZY)
+    private Set<Movie> movies = new HashSet<>();
 
 
     public Director(Long id, String directorName, String family, Integer age) {

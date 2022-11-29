@@ -33,21 +33,6 @@ public class Movie {
     private boolean watchMovie;
     private boolean watchLater;
 
-//    public void setDirector_id(Long director_id) {
-//        this.director_id = director_id;
-//    }
-//
-//    private Long director_id;
-
-//    @ManyToMany
-//    @JoinTable(name = "category",joinColumns =@JoinColumn(name="movie_id"),inverseJoinColumns=@JoinColumn(name="director_id"))
-//    private Set<Director> directors;//    public Set<Director> getDirectors() {
-////        return directors;
-////    }
-////
-////    public void setDirectors(Set<Director> directors) {
-////        this.directors = directors;
-////    }
 
     @ManyToMany()
     @JoinTable(
@@ -61,7 +46,13 @@ public class Movie {
         directors.add(director);
     }
 
-    public Movie(String name, String linkImdb, Integer createYear, Double imdbScore, boolean watchMovie, boolean watchLater) {
+    public Movie(String name,
+                 String linkImdb,
+                 Integer createYear,
+                 Double imdbScore,
+                 boolean watchMovie,
+                 boolean watchLater
+    ) {
         this.name = name;
         this.linkImdb = linkImdb;
         this.createYear = createYear;
@@ -83,7 +74,9 @@ public class Movie {
     public Movie(String name,
                  String linkImdb,
                  Integer createYear,
-                 Double imdbScore, Set<Director> directors) {
+                 Double imdbScore,
+                 Set<Director> directors
+    ) {
         this.name = name;
         this.linkImdb = linkImdb;
         this.createYear = createYear;

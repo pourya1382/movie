@@ -1,19 +1,21 @@
 package com.example.movie.movie.service;
-import java.io.*;
 
 import com.example.movie.movie.model.Movie;
 import com.example.movie.movie.repository.MovieRepository;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 
 @Configuration
 public class MovieCsv {
     public static String TYPE = "text/csv";
-    static String[] HEADERs = { "name", "linkImdb", "createYear", "imdbScore" };
+    static String[] HEADERs = {"name", "linkImdb", "createYear", "imdbScore"};
     private MovieRepository movieRepository;
 
     public MovieCsv(MovieRepository movieRepository) {

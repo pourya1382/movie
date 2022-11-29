@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,58 +24,48 @@ import java.io.Reader;
 import java.util.List;
 
 @Service
+
 public class MovieService {
     private MovieRepository movieRepository;
     private ModelMapper modelMapper;
     private DirectorRepository directorRepository;
 
-//    public void readCsv() {
-//        try {
-//            BufferedReader bufferedReader = new BufferedReader(new FileReader("src/main/resources/movie.csv"));
-//            while ((line = bufferedReader.readLine()) != null) {
-//                String[] data = line.split(",");
-//                int dataint = Integer.parseInt(data[2]);
-//
-//
-//
-//            Movie movie = new Movie();
-//            movie.setName(data[0]);
-//            movie.setLinkImdb(data[1]);
-//            movie.setCreateYear(data[2]);
-//            movie.setImdbScore(data[3]);
-//            movieRepository.save(movie);
-//            }
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-//
-//
-//    }
-
-    public MovieService(MovieRepository movieRepository, ModelMapper modelMapper, DirectorRepository directorRepository) {
+    public MovieService(MovieRepository movieRepository,
+                        ModelMapper modelMapper,
+                        DirectorRepository directorRepository
+    ) {
         this.movieRepository = movieRepository;
         this.modelMapper = modelMapper;
         this.directorRepository = directorRepository;
     }
 
-    public Page<Movie> getMovieBysearch(String movieName, int createYear, String view_Status, String watch_Later, String movie_sorting, String create_sorting, int page, int size) {
+    public Page<Movie> getMovieBysearch(String movieName,
+                                        Integer createYear,
+                                        String view_Status,
+                                        String watch_Later,
+                                        String movie_sorting,
+                                        String create_sorting,
+                                        int page,
+                                        int size
+    ) {
         Pageable pageable = PageRequest.of(page, size);
-
-        if (movie_sorting.equals("sort_by_name")) {
-            pageable = PageRequest.of(page, size, Sort.by("name"));
-        } else if (movie_sorting.equals("sort_by_name_descending")) {
-            pageable = PageRequest.of(page, size, Sort.by("name").descending());
-        } else if (create_sorting.equals("sort_by_create")) {
-            pageable = PageRequest.of(page, size, Sort.by("createYear"));
-        } else if (create_sorting.equals("sort_by_create_descending")) {
-            pageable = PageRequest.of(page, size, Sort.by("createYear").descending());
+        if (!movie_sorting.isEmpty()) {
+            if (movie_sorting.equals("sort_by_name")) {
+                pageable = PageRequest.of(page, size, Sort.by("name"));
+            } else if (movie_sorting.equals("sort_by_name_descending")) {
+                pageable = PageRequest.of(page, size, Sort.by("name").descending());
+            } else if (create_sorting.equals("sort_by_create")) {
+                pageable = PageRequest.of(page, size, Sort.by("createYear"));
+            } else if (create_sorting.equals("sort_by_create_descending")) {
+                pageable = PageRequest.of(page, size, Sort.by("createYear").descending());
+            }
         }
+
         Page<Movie> moviePage;
-        moviePage = movieRepository.findAll(pageable);
-        boolean watchLaterBoolean = Boolean.FALSE;
-        boolean viewStatusBoolean = Boolean.FALSE;
+        Boolean watchLaterBoolean = null;
+        Boolean viewStatusBoolean = null;
         if (!movieName.isEmpty()) {
-            movieName.toLowerCase();
+            movieName = movieName.toLowerCase();
         }
         if (watch_Later.equals("yes")) {
             watchLaterBoolean = Boolean.TRUE;
@@ -86,65 +77,12 @@ public class MovieService {
         } else if (view_Status.equals("unseen")) {
             viewStatusBoolean = Boolean.FALSE;
         }
+        return movieRepository.findAll(Specification.where(MovieSpecifiction.containName(movieName)).
+                        or(MovieSpecifiction.hasCreateYear(createYear)).
+                        or(MovieSpecifiction.hasWatchMovie(viewStatusBoolean)).
+                        or(MovieSpecifiction.hasWatchLater(watchLaterBoolean)),
+                pageable);
 
-        if (createYear == 0) {
-            if (view_Status.isEmpty() && watch_Later.isEmpty()) {
-                moviePage = movieRepository.findByNameContainingIgnoreCase(movieName, pageable);
-            } else if (view_Status.isEmpty() && !watch_Later.isEmpty()) {
-                moviePage = movieRepository.findByNameContainingIgnoreCaseAndWatchLater(movieName, watchLaterBoolean, pageable);
-            } else if (!view_Status.isEmpty() && watch_Later.isEmpty()) {
-                moviePage = movieRepository.findByNameContainingIgnoreCaseAndWatchMovie(movieName, viewStatusBoolean, pageable);
-            } else {
-                moviePage = movieRepository.findByNameContainingIgnoreCaseAndWatchMovieAndWatchLater(movieName, viewStatusBoolean, watchLaterBoolean, pageable);
-            }
-        } else {
-            if (view_Status.isEmpty() && watch_Later.isEmpty()) {
-                moviePage = movieRepository.findByNameContainingIgnoreCaseAndCreateYear(movieName,createYear, pageable);
-            } else if (view_Status.isEmpty() && !watch_Later.isEmpty()) {
-                moviePage = movieRepository.findByNameContainingIgnoreCaseAndCreateYearAndWatchLater(movieName,createYear, watchLaterBoolean, pageable);
-            } else if (!view_Status.isEmpty() && watch_Later.isEmpty()) {
-                moviePage = movieRepository.findByNameContainingIgnoreCaseAndCreateYearAndWatchMovie(movieName,createYear, viewStatusBoolean, pageable);
-            } else {
-                moviePage = movieRepository.findByNameContainingIgnoreCaseAndCreateYearAndWatchMovieAndWatchLater(movieName, createYear, viewStatusBoolean, watchLaterBoolean, pageable);
-            }
-        }
-//        if (movie_sorting.equals("sort_by_name")){
-//            moviePage = movieRepository.findByNameContainingIgnoreCaseAndWatchMovieAndWatchLater(movieName, viewStatusBoolean, watchLaterBoolean, pageable,Sort.by("name"));
-//        }
-
-//        if (createYear == 0) {
-//
-//            if (movieName.isEmpty()) {
-//                switch (create_sorting) {
-//                    case "by_name_sort":
-//                        moviePage = movieRepository.findByOrderByNameAndWatchMovieAndWatchLater(viewStatusBoolean, watchLaterBoolean, pageable);
-//                        break;
-//                    case "by_name_sort_invers":
-//                        moviePage = movieRepository.findByOrderByNameAscAndWatchMovieAndWatchLater(viewStatusBoolean, watchLaterBoolean, pageable);
-//                        break;
-//                }
-//            } else {
-//                switch (create_sorting) {
-//                    case "by_create_year_sort":
-//                        moviePage = movieRepository.findByNameOrderByCreateYearAndContainingIgnoreCaseAndWatchMovieAndWatchLater(movieName, viewStatusBoolean, watchLaterBoolean, pageable);
-//                        break;
-//                    case "by_create_year_sort_invers":
-//                        moviePage = movieRepository.findByOrderByCreateYearAscAndNameContainingIgnoreCaseAndWatchMovieAndWatchLater(movieName, viewStatusBoolean, watchLaterBoolean, pageable);
-//                        break;
-//                    default:
-//                        moviePage = movieRepository.findByNameContainingIgnoreCaseAndWatchMovieAndWatchLater(movieName, viewStatusBoolean, watchLaterBoolean, pageable);
-//                }
-//            }
-//        } else {
-//            if (movie_sorting.equals("by_name_sort")) {
-//                moviePage = movieRepository.findByOrderByNameAndCreateYearAndWatchMovieAndWatchLater(createYear, viewStatusBoolean, watchLaterBoolean, pageable);
-//            } else if (movie_sorting.equals("by_name_sort_invers")) {
-//                moviePage = movieRepository.findByOrderByNameAscAndCreateYearAndWatchMovieAndWatchLater(createYear, viewStatusBoolean, watchLaterBoolean, pageable);
-//            } else  {
-//                moviePage = movieRepository.findByNameContainingIgnoreCaseAndWatchMovieAndWatchLater(movieName, viewStatusBoolean, watchLaterBoolean, pageable);
-//            }
-//        }
-        return moviePage;
     }
 
     public String setCsv(MultipartFile file, Model model) {
@@ -158,10 +96,7 @@ public class MovieService {
             try (Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
 
                 // create csv bean reader
-                CsvToBean<Movie> csvToBean = new CsvToBeanBuilder(reader)
-                        .withType(Movie.class)
-                        .withIgnoreLeadingWhiteSpace(true)
-                        .build();
+                CsvToBean<Movie> csvToBean = new CsvToBeanBuilder(reader).withType(Movie.class).withIgnoreLeadingWhiteSpace(true).build();
 
                 // convert `CsvToBean` object to list of users
                 List<Movie> movies = csvToBean.parse();
@@ -209,19 +144,6 @@ public class MovieService {
         Director director = directorRepository.findByDirectorId(directorId).get();
         movie.setDirectors(director);
         return movieRepository.save(movie);
-    }
-
-    public Page<Movie> sortingMovie(int page, int size, String ascOrDesc) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<Movie> moviePage;
-        if (ascOrDesc.equals("asc")) {
-            moviePage = movieRepository.findByOrderByName(pageable);
-        } else if (ascOrDesc.equals("invers")) {
-            moviePage = movieRepository.findByOrderByNameDesc(pageable);
-        } else {
-            moviePage = movieRepository.findAll(pageable);
-        }
-        return moviePage;
     }
 
     public Page<Movie> getMovie(int page, int size) {
