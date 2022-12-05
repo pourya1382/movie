@@ -16,7 +16,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.web.multipart.MultipartFile;
-
 import javax.transaction.Transactional;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -29,7 +28,6 @@ public class MovieService {
     private MovieRepository movieRepository;
     private ModelMapper modelMapper;
     private DirectorRepository directorRepository;
-
     public MovieService(MovieRepository movieRepository,
                         ModelMapper modelMapper,
                         DirectorRepository directorRepository
@@ -37,6 +35,7 @@ public class MovieService {
         this.movieRepository = movieRepository;
         this.modelMapper = modelMapper;
         this.directorRepository = directorRepository;
+
     }
 
     public Page<Movie> getMovieBysearch(String movieName,

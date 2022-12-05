@@ -19,7 +19,7 @@ public class MovieController {
         this.directorService = directorService;
     }
 
-    @GetMapping("movie")
+    @GetMapping()
     public Page<Movie> getMovie(@RequestParam(defaultValue = "0") int page,
                                 @RequestParam(defaultValue = "3") int size
     ) {
@@ -27,7 +27,7 @@ public class MovieController {
     }
 
 
-    @GetMapping("movie/{movie_name}")
+    @GetMapping("{movie_name}")
     public Page<Movie> getMovie(@PathVariable(value = "movie_name", required = false) String movie_name,
                                 @RequestParam(required = false) Integer create_year,
                                 @RequestParam(required = false, defaultValue = " ") String view_status,
@@ -48,16 +48,8 @@ public class MovieController {
         );
     }
 
-    @GetMapping("sort")
-    public Page<Movie> searchAndSorting(@RequestParam(defaultValue = "0") int page,
-                                        @RequestParam(defaultValue = "3") int size,
-                                        @RequestParam(defaultValue = "asc") String ascOrDesc
-    ) {
-        return movieService.sortingMovie(page, size, ascOrDesc);
 
-    }
-
-    @PostMapping(path = "add-movie")
+    @PostMapping()
     public Movie addNewMovie(@RequestBody Movie movie) {
         return movieService.addNewMovie(movie);
     }

@@ -1,4 +1,5 @@
 package com.example.movie.director.controller;
+
 import com.example.movie.director.model.Director;
 import com.example.movie.director.model.DirectorDto;
 import com.example.movie.director.service.DirectorService;
@@ -21,7 +22,7 @@ public class DirectorController {
         return directorService.getDirector(page, size);
     }
 
-    @PostMapping(path = "add-director")
+    @PostMapping()
     public Director addNewDirector(@RequestBody Director director) {
         return directorService.addNewDirector(director);
     }
